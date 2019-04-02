@@ -1,0 +1,30 @@
+function [delta, len] = variableLength(raw,cursor)
+
+%%%%%%%%%%%%%%%%%% implement variable length delta time %%%%%%%%%%%%%%%%%%%
+% Return delta time and length of the delta time
+ 
+        delta_bin = de2bi(raw(cursor),8,'left-msb'); % store delta in binary
+        varLength = 1;           % store length of delta time
+        
+        % checks the 7th msb bit, which in my case is the first bit to know
+        % whether the next byte is part of the delta time
+        % if this is true the while loop appends the next byte without the most
+        % significant bit
+        append = de2bi(raw(cursor+varLength),8,'left-msb');
+        
+        while delta_bin(1+(varLength-1)*8) == 1
+            delta_bin = [delta_bin, append]
+            varLength = varLength +1;
+            append = de2bi(raw(cursor+varLength),8,'left-msb');
+        end
+        
+        delta_tmp = zeros(1,7*varLength);
+        for i=1:varLength
+        delta_tmp(1*i:7) = delta_bin(2:8)
+        %cursor = cursor + varLength; % now we're at the byte after the delta
+        delta = bi2de(delta_bin,'left-msb');
+        len = varLength;
+        
+
+
+end
