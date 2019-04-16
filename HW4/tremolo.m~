@@ -1,0 +1,41 @@
+function [ouput] = tremolo(input,type,rate,lag,depth,Fs)
+% this function performs stereo tremolo
+
+len = size(input,1);
+t = 0:1/Fs:len/Fs;
+t = t(1:len);
+
+% depth controls the minimum of the envelope
+% 1 means full scale
+% 0 means clean
+
+% lag?
+
+
+
+switch type
+    case 'sin'
+        envelope = sin(2*pi*rate*t);
+    case 'triangle'
+        envelope = sawtooth(2*pi*rate*t,0.5);
+    case 'square'
+        envelope = square(2*pi*rate*t);
+        
+end
+
+% make envelope go from 1 to (1-depth)
+
+% first: make envelope go from 1 to -1 to 1 to 0
+envelope = 2*envelope-1;
+% second: make envelope go from 1 to (1-depth)
+if depth ~= 1
+    envelope = envelope*(1-depth)
+    envelope = 
+end
+
+
+
+
+
+
+end

@@ -1,0 +1,62 @@
+function [output, gain,power] = compressor(audio, threshold, slope, avgLength)
+
+
+% based on threshold change gain of samples higher than threshold
+
+
+% gain is determined by slope and avg length
+
+% Initializations
+len = size(audio,1);
+gain = ones(1,len);      
+power = zeros(1,len);
+
+
+% find power at each point of the audio via round mean square (RMS)
+% beginning are corner case, treated separatedly
+
+
+for i = 1:len
+    
+    % corner case at the beginning
+    if i-avgLength < 1
+        power(i) = sqrt(sum(audio(i:i+avgLength).^2));
+    
+    else
+    power(i) = sqrt(sum(audio(i-avgLength:i).^2));
+    end
+end
+
+% normalize to 1
+
+power = power/avgLength; % in linear
+
+
+
+
+output = audio;
+
+for i = 1:len
+    if power(i) >= threshold
+        % what gain should be
+        gain(i) = (abs(output(i))^-1)*threshold+(power(i)-threshold)*slope;
+        % interpolate gain from 1
+        output(i) = output(i)*gain(i);
+        
+    end
+end
+%output2 = output.*gain;
+% interpolate gain to make it more linear
+%gain2 = interp1(1:2:len,gain(1:2:len),1:len,'spleen');
+
+%for i = 1:len
+%    output(i) = output(i)*gain2(i);
+%end
+
+
+end
+
+
+
+
+

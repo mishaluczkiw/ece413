@@ -1,0 +1,55 @@
+function [output] = delay(input,depth,delay,feedback,Fs)
+
+% This function alters the input signal by feeding back a delay of the
+% input signal.
+% The depth determines how much of the delayed signal is fed back: 0-1
+% Delay time is specified in milliseconds
+% Feedback controls the amplitude of the signal to be fed back from the
+% output to the input
+len = size(input,1);
+t = 0:1/Fs:(len/Fs);
+
+output = zeros(size(input));
+
+% similar conversion of delay into increments in t vector as in tremolo
+% with lag
+delay = delay/1000;
+delay = floor(delay*Fs);
+
+% filter constants: simulate degradation of treble/high end
+r = 0.5;
+theta = pi/4;
+a = [1, -2*r*cos(theta), r^2];
+b = [1, 1, 0];
+%filtered = filter(b,a,input);
+
+chunks = 100;
+delay_mix = zeros(chunks+1,size(input,2));
+for i = 1:len
+    if i-delay >= 1 && i+chunks <= len% delay is in effect
+        
+        delay_mix = (input(i,:)+depth*input(i-delay,:));
+        output(i,:) = delay_mix.*(1+feedback.*filter(b,a,delay_mix));
+        
+        % in chunks
+        %delay_mix(:,:) = input(i:i+chunks,:)+depth*input(i-delay:i-delay+chunks,:);
+        %output(i:i+chunks,:) = delay_mix.*(1+feedback.*filter(b,a,delay_mix));
+        
+    else
+    %if i+chunks<=len
+    
+        output(i,:) = input(i,:);
+        
+        %output(i:i+chunks,:) = input(i:i+chunks,:);
+    end
+        
+end
+
+
+
+
+
+
+
+
+end
